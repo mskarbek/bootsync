@@ -2,7 +2,7 @@
 
 set -e
 
-LASTKRN="$(rpm -q --qf '%{version}-%{release}.%{arch}\n' kernel | sort --sort=version --reverse | /bin/head -n 1)"
+LASTKRN="$(ls -rv /lib/modules | grep -m 1 .)"
 
 if ! [[ -e /boot/$(</etc/machine-id)/$LASTKRN ]]; then
    echo "kernel-$LASTKRN not found in /boot, aborting..." 1>&2

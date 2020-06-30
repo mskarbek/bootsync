@@ -1,0 +1,15 @@
+#!/bin/sh
+
+set -e
+
+LASTKRN="$(rpm -q --qf '%{version}-%{release}.%{arch}\n' kernel | sort --sort=version --reverse | /bin/head -n 1)"
+
+if ! [[ -e /boot/$(</etc/machine-id)/$LASTKRN ]]; then
+   echo "kernel-$LASTKRN not found in /boot, aborting..." 1>&2
+   exit 1
+fi
+
+TARGETS="$(ls -d /boot.? | grep -v ^$(/bin/realpath /boot)$)"
+
+/bin/xargs -r -n 1 /bin/mountpoint <<< $TARGETS
+/bin/xargs -r -n 1 /bin/rsync -q -r --delete /boot/ <<< $TARGETS

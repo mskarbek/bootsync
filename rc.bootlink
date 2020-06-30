@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -e
+
+DATA="$(/sbin/efibootmgr -v)"
+BOOT="$(grep ^BootCurrent: <<< $DATA | /bin/cut -d ' ' -f 2)"
+UUID="$(grep ^Boot$BOOT <<< $DATA | grep -o -P '[0-9a-f-]{36}')"
+TRGT="$(/bin/findmnt -n --source PARTUUID=$UUID --output target)"
+
+/bin/ln -v -snrf $TRGT /boot

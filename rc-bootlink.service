@@ -1,0 +1,13 @@
+[Unit]
+Description=link /boot to currently-booted ESP
+ConditionFileIsExecutable=/etc/rc.d/rc.bootlink
+After=local-fs.target
+
+[Service]
+Type=forking
+ExecStart=/etc/rc.d/rc.bootlink
+RemainAfterExit=yes
+GuessMainPID=no
+
+[Install]
+WantedBy=multi-user.target

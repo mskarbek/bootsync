@@ -2,9 +2,11 @@
 
 set -e
 
+shopt -s lastpipe
+
 DATA="$(/sbin/efibootmgr -v)"
-BOOT="$(grep ^BootCurrent: <<< $DATA | /bin/cut -d ' ' -f 2)"
-UUID="$(grep ^Boot$BOOT <<< $DATA | grep -o -P '[0-9a-f-]{36}')"
-TRGT="$(/bin/findmnt -n --source PARTUUID=$UUID --output target)"
+grep ^BootCurrent: <<< $DATA | read BOOT
+grep ^Boot${BOOT#BootCurrent: } <<< $DATA | grep -o -P '[0-9a-f-]{36}' | read UUID
+/bin/findmnt -n --source PARTUUID=$UUID --output target | read TRGT
 
 /bin/ln -v -snrf $TRGT /boot

@@ -36,6 +36,24 @@ This software consists of two Bash scripts and two corresponding systemd service
 
 The Bash scripts are stored in /etc/rc.d. One is named rc.bootlink. It creates and updates the /boot symlink. The other is named rc.bootsync. It calls rsync after performing a few basic safety checks. The Bash scripts can be run manually with sudo. They do not take any parameters. In fact, I recommend running them manually once right after they are installed to be sure that they are working properly. I also recommend making a backup of your ESP before running them for the first time just to be safe.
 
+# SELinux
+
+To work with selinux, you will also need to compile and install the supplied bootsync.te rules. Commands similar to the following should get the job done:
+
+```
+$ cp -v bootsync.te /tmp
+$ make -C /tmp -f /usr/share/selinux/devel/Makefile bootsync.pp
+$ sudo semodule -X 300 -i /tmp/bootsync.pp
+```
+
+The following selinux context rule may also be helpful:
+
+```
+$ sudo semanage fcontext -a -t boot_t "/boot\.(a|b)(/.*)?"
+```
+
+I will attempt to integrate the above selinux configuration into the Makefile in a future revision of to this respository.
+
 # Final notes
 
 I use these scripts on Fedora systems (Workstation edition, not Silverblue) where I have my ESPs mounted to /boot.{a,b} and these partitions contain both the bootloader ([systemd-boot](https://www.freedesktop.org/wiki/Software/systemd/systemd-boot/)) and the kernel+initramfs. This configuration is recommended by the [Boot Loader Specification](https://systemd.io/BOOT_LOADER_SPECIFICATION/) which is part of the systemd project.

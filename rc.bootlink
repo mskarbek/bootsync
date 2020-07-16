@@ -10,3 +10,4 @@ grep ^Boot${BOOT#BootCurrent: } <<< $DATA | grep -o -P '[0-9a-f-]{36}' | read UU
 /bin/findmnt -n --source PARTUUID=$UUID --output target | read TRGT
 
 /bin/ln -v -snrf $TRGT /boot
+/bin/chcon -h -t boot_t /boot || true

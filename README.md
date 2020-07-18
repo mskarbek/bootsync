@@ -21,8 +21,8 @@ These scripts expect that the ESPs to be kept synchronized are mounted to direct
 
 The /boot.? mount points are expected to be  available early in the system start up process. This is usually accomplished by listing the mounts in the /etc/fstab system configuration file. Your /etc/fstab file might contain lines like the following for example:
 
-    PARTLABEL=boot.a /boot.a vfat umask=0077,shortname=lower,nofail 0 0
-    PARTLABEL=boot.b /boot.b vfat umask=0077,shortname=lower,nofail 0 0
+    PARTLABEL=boot.a /boot.a vfat umask=0077,shortname=lower,context=system_u:object_r:boot_t:s0,nofail 0 0
+    PARTLABEL=boot.b /boot.b vfat umask=0077,shortname=lower,context=system_u:object_r:boot_t:s0,nofail 0 0
 
 There should not exist a *directory* named /boot. Instead, these scripts will maintain a *symlink* named /boot that will be set to point to whichever ESP is currently being used on system start up. You can disable the rc-booklink systemd service and maintain the link yourself if you wish, but /boot must be a symlink, not a directory.
 

@@ -60,6 +60,28 @@ I use these scripts on Fedora systems (Workstation edition, not Silverblue) wher
 
 The GRUB bootloader is known to have problems with this configuration because it attempts to put a symlink below /boot. I have not tested these scripts with GRUB and I do not expect that they will work (properly) with GRUB. Feel free to try and get this to work with GRUB if you like, but my personal recommendation is to switch to using systemd-boot if possible. Please do not send pull requests to integrate GRUB compatibility features. I want to keep these scripts as simple as possible (no GRUB hacks please).
 
+With SELinux, you may find errors similar to the following in /var/log/audit/audit.log:
+
+```
+avc:  denied  { remount } for  pid=1201 comm="(earlyoom)" scontext=system_u:system_r:init_t:s0 tcontext=system_u:object_r:boot_t:s0 tclass=filesystem
+```
+
+The following selinux type enforcement (te) file should work around the above error. I am not, however, 100% sure that this is the correct way to fix the problem. There may be a bug in Fedora 32's default policy. If you get the above error, I would suggest compiling the below ruleset as separate module named bootrmnt.pp. You should be able to do so using the same set of commands demonstrated above for the bootsync policy package (pp). If Fedora's default policy is later changed such that this policy package is no longer needed, then you should be able to remove it with `semodule -r bootrmnt`.
+
+```
+
+module bootrmnt 1.0;
+
+require {
+	type init_t;
+	type boot_t;
+	class filesystem remount;
+}
+
+#============= init_t ==============
+allow init_t boot_t:filesystem remount;
+```
+
 # Disclaimer
 
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
